@@ -31,7 +31,7 @@ class Bot:
     def get_timer(self):
         return self.__timer
 
-    def get_bot_commands(self):
+    def get___bot_commands(self):
         cmds = []
         for cmd in self.commands:
             cmd.append(cmd + " - " + self.commands[cmd][2])
@@ -43,10 +43,12 @@ class Bot:
     def get_default_message(self):
         return self.__bad_usage_message
 
-    def get_bot_name(self):
+    def get___bot_name(self):
         return self.__bot.getMe().username
 
-    def send_message(self, chat_id, message, markup):
+    def send_message(self, chat_id, message, markup=None):
+        if not markup:
+            markup = telegram.ReplyKeyboardHide
         self.__bot.sendMessage(chat_id, message, reply_markup=markup)
 
     def wait_for_message(self, chat_id, timeout=5):
@@ -65,7 +67,7 @@ class Bot:
     def activate(self):
         if not self.__initiated:
             self.__initiated = True
-            updates = self.bot.getUpdates(offset = None)
+            updates = self.__bot.getUpdates(offset = None)
             if updates:
                 self.__offset = updates[-1].update_id + 1
             print self.__offset
@@ -77,7 +79,7 @@ class Bot:
     def __listen_loop(self):
         print 'listen loop'
         # add all unhandled messages to queue
-        updates = self.bot.getUpdates(offset=self.__offset)
+        updates = self.__bot.getUpdates(offset=self.__offset)
         if updates:
                 self.__offset = updates[-1].update_id + 1
                 for u in updates:
@@ -89,14 +91,14 @@ class Bot:
         while self.__message_queue:
             message = self.__message_queue.popleft()
             command_and_params = message.text.split()
-            if command_and_params[0] in self.commands:
-                self.commands[command_and_params[0]](message.things, command_and_params[1:])
+            if command_and_params[0] in self.__commands:
+                self.__commands[command_and_params[0]](message.things, command_and_params[1:])
             else:
                 print 'skipped command %s, not supported' % command_and_params[0]
-                self.send_message(message.chat_id, self.bad_usage_message)
+                self.send_message(message.chat_id, self.__bad_usage_message)
 
         # call self
-        threading.Timer(self.timer, self.__listen_loop).start()
+        threading.Timer(self.__timer, self.__listen_loop).start()
 
 def main():
     bot = Bot(token = '113022701:AAHsn9FiQoHHKIZ4b4OpLekFXTKZOc34lfs', timer = 1)
