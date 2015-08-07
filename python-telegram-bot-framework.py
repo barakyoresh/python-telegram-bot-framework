@@ -6,6 +6,7 @@ import re
 
 class Bot:
     timer = 1
+    commands = {} #name : (cb, params, description)
     bad_usage_message = 'Unrecognized command or parameters.'
     bot = None
 
@@ -33,7 +34,7 @@ class Bot:
     def send_message(self, chat_id, message):
         pass
 
-    def wait_for_message(self, chat_id):
+    def wait_for_message(self, chat_id, timeout):
         pass
 
     def add_command(self, cmd_name, cmd_description, cmd_params, cmd_cb):
