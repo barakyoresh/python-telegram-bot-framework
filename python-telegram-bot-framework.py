@@ -54,7 +54,7 @@ class Bot:
     def wait_for_message(self, chat_id, timeout=5):
         updates = self.__bot.getUpdates(offset=self.__offset)
         time_passed = 1
-        while not updates or time_passed <= timeout:
+        while not updates and time_passed <= timeout:
             time.sleep(SLEEP_TIME_STEP)
             time_passed += SLEEP_TIME_STEP
             updates = self.__bot.getUpdates(offset=self.__offset)
