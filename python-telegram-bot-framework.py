@@ -54,7 +54,7 @@ class Bot:
     def wait_for_message(self, chat_id, timeout=5):
         updates = self.__bot.getUpdates(offset=self.__offset)
         time_passed = 1
-        while not updates or time_passed <= timeout:
+        while not updates and time_passed <= timeout:
             time.sleep(SLEEP_TIME_STEP)
             time_passed += SLEEP_TIME_STEP
             updates = self.__bot.getUpdates(offset=self.__offset)
@@ -99,7 +99,7 @@ class Bot:
             message = self.__message_queue.popleft()
             command_and_params = message.text.split()
             if command_and_params[0] in self.__commands:
-                self.__commands[command_and_params[0]][0](message.chat_id, message.text[message.text.find(' '):] if len(command_and_params) > 1 else '')
+                self.__commands[command_and_params[0]][0](message.chat_id, message.text[message.text.find(' '):] if len(command_and_params) > 1 else None)
             else:
                 print 'skipped command %s, not supported' % command_and_params[0]
                 self.send_message(message.chat_id, self.__bad_usage_message % command_and_params[0])
@@ -116,10 +116,14 @@ def main():
     bot.activate()
 
 def callback(chat_id, params):
-    bot.send_message(chat_id=chat_id, message='wrong params fool, put in number - ')
-    param = bot.wait_for_message(chat_id=chat_id, timeout=10)
-    print 'param - ', param
-    bot.send_message(chat_id=chat_id, message='%s ? kthxbye' % param)
+    if not params:
+        bot.send_message(chat_id=chat_id, message='wrong params fool, put in number - ')
+        params = bot.wait_for_message(chat_id=chat_id, timeout=10)
+
+    if not params:
+        params = 'none'
+    print 'params - ', params
+    bot.send_message(chat_id=chat_id, message='%s ? kthxbye' % params)
 
 
 
