@@ -67,7 +67,8 @@ class Bot:
 
         return message
 
-    def add_command(self, cmd_name, cmd_description, cmd_params, cmd_cb):
+    def add_command(self, cmd_name, cmd_cb, cmd_description = None):
+        self.__commands[cmd_name] = (cmd_cb, cmd_description)
         pass
 
     def activate(self):
@@ -98,7 +99,7 @@ class Bot:
             message = self.__message_queue.popleft()
             command_and_params = message.text.split()
             if command_and_params[0] in self.__commands:
-                self.__commands[command_and_params[0]](message.chat_id, message.text[message.text.find(' '):] if len(command_and_params) > 1 else '')
+                self.__commands[command_and_params[0]][0](message.chat_id, message.text[message.text.find(' '):] if len(command_and_params) > 1 else '')
             else:
                 print 'skipped command %s, not supported' % command_and_params[0]
                 self.send_message(message.chat_id, self.__bad_usage_message % command_and_params[0])
@@ -111,12 +112,15 @@ class Bot:
 def main():
     global bot
     bot = Bot(token = '113022701:AAHsn9FiQoHHKIZ4b4OpLekFXTKZOc34lfs', timer = 1)
-    bot.add_command(cmd_name='/cmd', cb=callback)
+    bot.add_command(cmd_name='/cmd', cmd_cb=callback)
     bot.activate()
 
 def callback(chat_id, params):
     bot.send_message(chat_id=chat_id, message='wrong params fool, put in number - ')
-    print 'param - ', bot.wait_for_message(chat_id=chat_id, timeout=10)
+    param = bot.wait_for_message(chat_id=chat_id, timeout=10)
+    print 'param - ', param
+    bot.send_message(chat_id=chat_id, message='%s ? kthxbye' % param)
+
 
 
 if __name__ == "__main__":
