@@ -31,7 +31,7 @@ class Bot:
     def get_timer(self):
         return self.__timer
 
-    def get___bot_commands(self):
+    def get_bot_commands(self):
         cmds = []
         for cmd in self.commands:
             cmd.append(cmd + " - " + self.commands[cmd][2])
@@ -43,7 +43,7 @@ class Bot:
     def get_default_message(self):
         return self.__bad_usage_message
 
-    def get___bot_name(self):
+    def get_bot_name(self):
         return self.__bot.getMe().username
 
     def send_message(self, chat_id, message, markup=None):
@@ -54,12 +54,18 @@ class Bot:
     def wait_for_message(self, chat_id, timeout=5):
         updates = self.__bot.getUpdates(offset=self.__offset)
         time_passed = 1
-        while not updates.results or time_passed <= timeout:
+        while not updates or time_passed <= timeout:
             time.sleep(SLEEP_TIME_STEP)
             time_passed += SLEEP_TIME_STEP
             updates = self.__bot.getUpdates(offset=self.__offset)
 
+        message = None
 
+        if updates:
+            message = updates[0].message.text
+            self.__offset = updates[0].update_id + 1
+
+        return message
 
     def add_command(self, cmd_name, cmd_description, cmd_params, cmd_cb):
         pass
