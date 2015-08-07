@@ -11,7 +11,7 @@ class Bot:
     __initiated = False
     __timer = 1
     __commands = {} #name : (cb, params, description)
-    __bad_usage_message = 'Unrecognized command or parameters.'
+    __bad_usage_message = 'Unrecognized command - %s.'
     __bot = None
     __offset = None
 
@@ -92,17 +92,25 @@ class Bot:
             message = self.__message_queue.popleft()
             command_and_params = message.text.split()
             if command_and_params[0] in self.__commands:
-                self.__commands[command_and_params[0]](message.things, command_and_params[1:])
+                self.__commands[command_and_params[0]](message.chat_id, message.text[message.text.find(' '):] if len(command_and_params) > 1 else '')
             else:
                 print 'skipped command %s, not supported' % command_and_params[0]
-                self.send_message(message.chat_id, self.__bad_usage_message)
+                self.send_message(message.chat_id, self.__bad_usage_message % command_and_params[0])
 
         # call self
         threading.Timer(self.__timer, self.__listen_loop).start()
 
+
+
 def main():
+    global bot
     bot = Bot(token = '113022701:AAHsn9FiQoHHKIZ4b4OpLekFXTKZOc34lfs', timer = 1)
+    bot.add_command(cmd_name='/cmd', cb=callback)
     bot.activate()
+
+def callback(chat_id, params):
+    bot.send_message(chat_id=chat_id, message='wrong params fool, put in number - ')
+    print 'param - ', bot.wait_for_message(chat_id=chat_id, timeout=10)
 
 
 if __name__ == "__main__":
