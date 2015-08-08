@@ -141,6 +141,7 @@ def callback(message, params):
     if not params:
         params = 'none'
     print 'params - ', params
+    telegram.Emoji.CROSS_MARK
     bot.send_message(chat_id=message.chat_id, message='%s ? kthxbye' % params)
 
 
