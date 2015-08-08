@@ -113,7 +113,7 @@ class Bot:
             message = self.__message_queue.popleft()
             command_and_params = message.text.split()
             if command_and_params[0] in self.__commands:
-                self.__commands[command_and_params[0]][0](message.chat_id, message.text[message.text.find(' '):] if len(command_and_params) > 1 else None)
+                self.__commands[command_and_params[0]][0](message, message.text[message.text.find(' '):] if len(command_and_params) > 1 else None)
             else:
                 print 'skipped command %s, not supported' % command_and_params[0]
                 self.send_message(message.chat_id, self.__bad_usage_message % command_and_params[0])
@@ -129,15 +129,15 @@ def main():
     bot.add_command(cmd_name='/cmd', cmd_cb=callback)
     bot.activate()
 
-def callback(chat_id, params):
+def callback(message, params):
     if not params:
-        bot.send_message(chat_id=chat_id, message='wrong params fool, put in number - ')
-        params = bot.wait_for_message(chat_id=chat_id, timeout=10)
+        bot.send_message(chat_id=message.chat_id, message='wrong params %s, put in number - ' % message.chat.first_name)
+        params = bot.wait_for_message(chat_id=message.chat_id, timeout=10)
 
     if not params:
         params = 'none'
     print 'params - ', params
-    bot.send_message(chat_id=chat_id, message='%s ? kthxbye' % params)
+    bot.send_message(chat_id=message.chat_id, message='%s ? kthxbye' % params)
 
 
 
