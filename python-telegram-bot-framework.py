@@ -14,6 +14,7 @@ class Bot:
     __bad_usage_message = 'Unrecognized command - %s.'
     __bot = None
     __offset = None
+    Emoji = None
 
     def __init__(self, token, bad_usage_message = None, timer = None):
         if not token:
@@ -24,6 +25,7 @@ class Bot:
             self.__bad_usage_message = bad_usage_message
 
         self.__bot = telegram.Bot(token=token)
+        self.Emoji = bot.Emoji
 
     def set_timer(self, new_timer):
         self.__timer = new_timer
