@@ -72,7 +72,7 @@ class Bot:
 
         if update_rcvd:
             ind = [u.message.chat_id for u in updates].index(chat_id)
-            message = updates[ind].message.text
+            message = updates[ind].message
             self.__offset = updates[ind].update_id + 1
             self.__enqueue_updates(updates[:ind])
 
@@ -132,7 +132,7 @@ def main():
 def callback(message, params):
     if not params:
         bot.send_message(chat_id=message.chat_id, message='wrong params %s, put in number - ' % message.chat.first_name)
-        params = bot.wait_for_message(chat_id=message.chat_id, timeout=10)
+        msg, params = bot.wait_for_message(chat_id=message.chat_id, timeout=10)
 
     if not params:
         params = 'none'
