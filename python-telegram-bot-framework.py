@@ -52,24 +52,39 @@ class Bot:
         self.__bot.sendMessage(chat_id, message, reply_markup=markup)
 
     def wait_for_message(self, chat_id, timeout=5):
+        #check in queue
+        for msg in self.__message_queue:
+            if msg.chat_id == chat_id:
+                self.__message_queue.remove(msg)
+                return msg.text
+
+        #check for updates
         updates = self.__bot.getUpdates(offset=self.__offset)
         time_passed = 1
-        while not updates and time_passed <= timeout:
+        update_rcvd = chat_id in [u.message.chat_id for u in updates]
+        while not update_rcvd and time_passed <= timeout:
             time.sleep(SLEEP_TIME_STEP)
             time_passed += SLEEP_TIME_STEP
             updates = self.__bot.getUpdates(offset=self.__offset)
+            update_rcvd = chat_id in [u.message.chat_id for u in updates]
 
         message = None
 
-        if updates:
-            message = updates[0].message.text
-            self.__offset = updates[0].update_id + 1
+        if update_rcvd:
+            ind = [u.message.chat_id for u in updates].index(chat_id)
+            message = updates[ind].message.text
+            self.__offset = updates[ind].update_id + 1
+            self.__enqueue_updates(updates[:ind])
 
         return message
 
+    def __enqueue_updates(self, updates):
+        for u in updates:
+            self.__message_queue.append(u.message)
+
+
     def add_command(self, cmd_name, cmd_cb, cmd_description = None):
         self.__commands[cmd_name] = (cmd_cb, cmd_description)
-        pass
 
     def activate(self):
         if not self.__initiated:
@@ -89,8 +104,7 @@ class Bot:
         updates = self.__bot.getUpdates(offset=self.__offset)
         if updates:
                 self.__offset = updates[-1].update_id + 1
-                for u in updates:
-                    self.__message_queue.append(u.message)
+                self.__enqueue_updates(updates)
         print self.__message_queue
 
 
