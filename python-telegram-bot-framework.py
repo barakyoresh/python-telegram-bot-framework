@@ -56,7 +56,7 @@ class Bot:
         for msg in self.__message_queue:
             if msg.chat_id == chat_id:
                 self.__message_queue.remove(msg)
-                return msg.text
+                return msg, msg.text
 
         #check for updates
         updates = self.__bot.getUpdates(offset=self.__offset)
@@ -76,7 +76,7 @@ class Bot:
             self.__offset = updates[ind].update_id + 1
             self.__enqueue_updates(updates[:ind])
 
-        return message
+        return message, message.text
 
     def __enqueue_updates(self, updates):
         for u in updates:
