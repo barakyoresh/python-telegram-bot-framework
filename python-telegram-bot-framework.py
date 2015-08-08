@@ -69,12 +69,14 @@ class Bot:
             update_rcvd = chat_id in [u.message.chat_id for u in updates]
 
         message = None
+        text = None
 
         if update_rcvd:
             ind = [u.message.chat_id for u in updates].index(chat_id)
             message = updates[ind].message
             self.__offset = updates[ind].update_id + 1
             self.__enqueue_updates(updates[:ind])
+            text = message.text
 
         return message, message.text
 
