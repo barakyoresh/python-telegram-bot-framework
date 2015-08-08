@@ -6,6 +6,7 @@ from collections import deque
 
 SLEEP_TIME_STEP = 1
 
+
 class Bot:
     __message_queue = deque([])
     __initiated = False
@@ -116,7 +117,7 @@ class Bot:
             message = self.__message_queue.popleft()
             command_and_params = message.text.split()
             if command_and_params[0] in self.__commands:
-                self.__commands[command_and_params[0]][0](message, message.text[message.text.find(' '):] if len(command_and_params) > 1 else None)
+                self.__commands[command_and_params[0]][0](message, message.text[message.text.find(' ')+1:] if len(command_and_params) > 1 else None)
             else:
                 print 'skipped command %s, not supported' % command_and_params[0]
                 self.send_message(message.chat_id, self.__bad_usage_message % command_and_params[0])
@@ -124,27 +125,3 @@ class Bot:
         # call self
         threading.Timer(self.__timer, self.__listen_loop).start()
 
-
-
-def main():
-    global bot
-    bot = Bot(token = '113022701:AAHsn9FiQoHHKIZ4b4OpLekFXTKZOc34lfs', timer = 1)
-    bot.add_command(cmd_name='/cmd', cmd_cb=callback)
-    bot.activate()
-
-def callback(message, params):
-    bot.send_message(chat_id=message.chat_id, message=bot.Emoji.DI)
-    if not params:
-        bot.send_message(chat_id=message.chat_id, message='wrong params %s, put in number - ' % message.chat.first_name)
-        msg, params = bot.wait_for_message(chat_id=message.chat_id, timeout=10)
-
-    if not params:
-        params = 'none'
-    print 'params - ', params
-    telegram.Emoji.CROSS_MARK
-    bot.send_message(chat_id=message.chat_id, message='%s ? kthxbye' % params)
-
-
-
-if __name__ == "__main__":
-    main()
