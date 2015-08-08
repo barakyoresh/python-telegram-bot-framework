@@ -14,7 +14,7 @@ class Bot:
     __bad_usage_message = 'Unrecognized command - %s.'
     __bot = None
     __offset = None
-    Emoji = None
+    Emoji = telegram.Emoji
 
     def __init__(self, token, bad_usage_message = None, timer = None):
         if not token:
@@ -25,7 +25,6 @@ class Bot:
             self.__bad_usage_message = bad_usage_message
 
         self.__bot = telegram.Bot(token=token)
-        self.Emoji = bot.Emoji
 
     def set_timer(self, new_timer):
         self.__timer = new_timer
@@ -134,6 +133,7 @@ def main():
     bot.activate()
 
 def callback(message, params):
+    bot.send_message(chat_id=message.chat_id, message=bot.Emoji.DI)
     if not params:
         bot.send_message(chat_id=message.chat_id, message='wrong params %s, put in number - ' % message.chat.first_name)
         msg, params = bot.wait_for_message(chat_id=message.chat_id, timeout=10)
